@@ -1,39 +1,60 @@
-const id = location.pathname.replace("/","")
-
-const api =
-"https://cdn.syndication.twimg.com/tweet-result?id="+id
-
-fetch(api)
-.then(r=>r.json())
-.then(data=>{
-
-if(!data.video){
- document.body.innerHTML="No video found"
- return
+function getTweetId(url) {
+  const match = url.match(/status\/(\d+)/)
+  if (match) return match[1]
+  return null
 }
 
-let variants = data.video.variants
- .filter(v=>v.bitrate)
- .sort((a,b)=>b.bitrate-a.bitrate)
+async function loadVideo() {
 
-let best = variants[0]
+  const input = document.getElementById("url").value.trim()
+  const id = getTweetId(input)
 
-document.getElementById("player").innerHTML =
-`<video controls src="${best.url}"></video>`
+  if (!id) {
+    alert("Invalid X/Twitter link")
+    return
+  }
 
-let html=""
+  const api = "YOUR_WORKER_URL?id=" + id
 
-variants.forEach(v=>{
+  try {
 
-let quality = Math.round(v.bitrate/1000)
+    const res = await fetch(api)
+    const data = await res.json()
 
-html += `
-<a class="btn" href="${v.url}">
-Download ${quality} kbps
-</a>`
+    if (!data.videos || data.videos.length === 0) {
+      alert("No video found")
+      return
+    }
 
-})
+    const variants = data.videos
 
-document.getElementById("downloads").innerHTML = html
+    // video preview (quality cao nhất)
+    const best = variants[0]
 
-})
+    document.getElementById("player").innerHTML =
+      `<video controls src="${best.url}"></video>`
+
+    // tạo nút download
+    let html = ""
+
+    variants.forEach(v => {
+
+      const quality = Math.round(v.bitrate / 1000)
+
+      html += `
+      <a class="download" href="${v.url}" target="_blank">
+        Download ${quality} kbps
+      </a>
+      `
+    })
+
+    document.getElementById("result").innerHTML = html
+
+  } catch (err) {
+
+    console.error(err)
+    alert("Error loading video")
+
+  }
+
+}
