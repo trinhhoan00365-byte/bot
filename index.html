@@ -70,65 +70,6 @@ video{
 
 <div id="result"></div>
 
-<script>
-
-function getID(url){
-
- let match = url.match(/status\/(\d+)/)
-
- if(match) return match[1]
-
- return null
-}
-
-async function loadVideo(){
-
- let url = document.getElementById("url").value
-
- let id = getID(url)
-
- if(!id){
-  alert("Invalid link")
-  return
- }
-
- let api =
- "https://yourworker.workers.dev?id="+id
-
- let res = await fetch(api)
-
- let data = await res.json()
-
- let variants = data.videos
-
- if(!variants){
-  alert("No video found")
-  return
- }
-
- let best = variants[0]
-
- document.getElementById("player").innerHTML =
- `<video controls src="${best.url}"></video>`
-
- let html=""
-
- variants.forEach(v=>{
-
-  let quality = Math.round(v.bitrate/1000)
-
-  html += `
-  <a class="download" href="${v.url}" target="_blank">
-  Download ${quality} kbps
-  </a>
-  `
- })
-
- document.getElementById("result").innerHTML = html
-
-}
-
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
