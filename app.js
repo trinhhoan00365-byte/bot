@@ -14,7 +14,7 @@ async function loadVideo() {
     return
   }
 
-  const api = "YOUR_WORKER_URL?id=" + id
+  const api = "https://fo.trinhhoan00365.workers.dev?id=" + id
 
   try {
 
