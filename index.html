@@ -5,20 +5,43 @@
 <title>X Video Downloader</title>
 
 <style>
+
 body{
- background:#0f0f1a;
+ background:#111;
  color:white;
+ font-family:Arial;
  text-align:center;
- font-family:sans-serif;
+ padding:40px;
+}
+
+h1{
+ margin-bottom:30px;
+}
+
+input{
+ width:60%;
+ padding:12px;
+ border-radius:8px;
+ border:none;
+ margin-bottom:20px;
+}
+
+button{
+ padding:12px 20px;
+ border:none;
+ border-radius:8px;
+ background:#7a5cff;
+ color:white;
+ cursor:pointer;
 }
 
 video{
- width:80%;
- margin-top:20px;
+ width:70%;
+ margin-top:30px;
  border-radius:10px;
 }
 
-.btn{
+.download{
  display:block;
  width:200px;
  margin:10px auto;
@@ -28,19 +51,83 @@ video{
  text-decoration:none;
  border-radius:8px;
 }
-</style>
 
+</style>
 </head>
 
 <body>
 
-<h2>Download Video</h2>
+<h1>X Video Downloader</h1>
+
+<input id="url" placeholder="Paste X / Twitter link here">
+
+<br>
+
+<button onclick="loadVideo()">Download</button>
 
 <div id="player"></div>
 
-<div id="downloads"></div>
+<div id="result"></div>
 
-<script src="app.js"></script>
+<script>
+
+function getID(url){
+
+ let match = url.match(/status\/(\d+)/)
+
+ if(match) return match[1]
+
+ return null
+}
+
+async function loadVideo(){
+
+ let url = document.getElementById("url").value
+
+ let id = getID(url)
+
+ if(!id){
+  alert("Invalid link")
+  return
+ }
+
+ let api =
+ "https://yourworker.workers.dev?id="+id
+
+ let res = await fetch(api)
+
+ let data = await res.json()
+
+ let variants = data.videos
+
+ if(!variants){
+  alert("No video found")
+  return
+ }
+
+ let best = variants[0]
+
+ document.getElementById("player").innerHTML =
+ `<video controls src="${best.url}"></video>`
+
+ let html=""
+
+ variants.forEach(v=>{
+
+  let quality = Math.round(v.bitrate/1000)
+
+  html += `
+  <a class="download" href="${v.url}" target="_blank">
+  Download ${quality} kbps
+  </a>
+  `
+ })
+
+ document.getElementById("result").innerHTML = html
+
+}
+
+</script>
 
 </body>
 </html>
